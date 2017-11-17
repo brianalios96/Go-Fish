@@ -14,13 +14,18 @@ public class Player
 		this.deck = deck;
 	}
 
-	public void requestCardsFromOther(CardRank rank, Player other)
+	public boolean requestCardsFromOther(CardRank rank, Player other)
 	{
+		boolean retval = true;
 		Card[] input = other.giveCards(rank);
 		if(input.length == 0)
 		{
 			Card tmp = deck.drawCard();
 			hand.add(tmp);
+			if(tmp.getRank() != rank)
+			{
+				retval = false;
+			}
 		}
 		else
 		{
@@ -30,7 +35,34 @@ public class Player
 			}
 		}
 		
+		for(CardRank aRank: CardRank.values())
+		{
+			int count = 0;
+			
+			for(Card card: hand)
+			{
+				if(card.getRank() == aRank)
+				{
+					count++;
+				}
+			}
+			
+			if(count == 4)
+			{
+				score++;
+				for(int i = 0; i < hand.size(); i++)
+				{
+					if(hand.get(i).getRank() == aRank)
+					{
+						hand.remove(i);
+						i--;
+					}
+				}
+			}
+		}
+		
 		Collections.sort(hand);
+		return retval;
 	}
 	
 	public Card[] giveCards(CardRank rank)
@@ -60,6 +92,11 @@ public class Player
 		}
 		
 		return cards;
+	}
+	
+	public int getScore()
+	{
+		return score;
 	}
 	
 }
