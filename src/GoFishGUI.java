@@ -13,6 +13,9 @@ public class GoFishGUI extends Application {
 	private static final int WINDOW_HEIGHT = 600;
 	
 	private PointView playerpoints;
+	
+	private Deck deck;
+	private Player players[];
 
 	public static void main(String args[]) {
 		launch(args);
@@ -20,6 +23,17 @@ public class GoFishGUI extends Application {
 
 	@Override
 	public void start(Stage stage) throws Exception {
+		
+		//Initialize the deck and the 3 players
+		deck= new Deck();
+		players= new Player[3];
+		for(int i=0; i<3; i++)
+		{
+			players[i]= new Player(deck);
+		}
+		//players ready to play the game
+		
+		
 		// Initialize primary window
 		Pane root = new Pane();
 		Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
