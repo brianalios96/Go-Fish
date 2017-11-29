@@ -4,6 +4,8 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
+//Dantran93/openburn
+
 public class GoFishGUI extends Application {
 
 	private static final String WINDOW_TITLE = "Go Fish";
@@ -29,7 +31,7 @@ public class GoFishGUI extends Application {
 		players= new Player[3];
 		for(int i=0; i<3; i++)
 		{
-			players[i]= new Player(deck);
+			players[i]= new Player(deck, "Player"+(i+1), (i+1));
 		}
 		//players ready to play the game
 		
@@ -51,6 +53,13 @@ public class GoFishGUI extends Application {
 		showOtherPlayerPoints(frame);
 		// Display window
 		stage.show();
+		
+		startgame();
+	}
+
+	private void startgame() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	private void showOtherPlayerPoints(Pane frame) {
