@@ -1,7 +1,10 @@
+import java.io.Serializable;
+
 import javafx.scene.image.Image;
 
-public class Card implements Comparable<Card>
+public class Card implements Comparable<Card>, Serializable
 {
+	private static final long serialVersionUID = 3563714765503218503L;
 	private CardRank rank;
 	private Image picture;
 	

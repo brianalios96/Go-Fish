@@ -31,7 +31,7 @@ public class GoFishGUI extends Application {
 		players= new Player[3];
 		for(int i=0; i<3; i++)
 		{
-			players[i]= new Player(deck, "Player"+(i+1), (i+1));
+			players[i]= new Player("Player"+(i+1), (i+1));
 		}
 		//players ready to play the game
 		

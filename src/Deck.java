@@ -7,7 +7,7 @@ public class Deck
 	
 	public Deck()
 	{
-		theDeck = new ArrayList<Card>(40);//52);
+		theDeck = new ArrayList<Card>(40);
 		
 		for(CardRank rank: CardRank.values())
 		{
@@ -16,6 +16,7 @@ public class Deck
 				theDeck.add(new Card(rank, null));
 			}
 		}
+		shuffle();
 	}
 	
 	public int getNumofDeckLeft()
