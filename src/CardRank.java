@@ -1,7 +1,6 @@
 
 public enum CardRank
 {
-	//ACE,
 	ONE(1),
 	TWO(2),
 	THREE(3),
@@ -11,10 +10,8 @@ public enum CardRank
 	SEVEN(7),
 	EIGHT(8),
 	NINE(9),
-	TEN(10);//,
-	//JACK,
-	//QUEEN,
-	//KING
+	TEN(10);
+	
 	private int value;
 
 	CardRank(int val) {
