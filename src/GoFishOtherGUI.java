@@ -10,7 +10,48 @@ public class GoFishOtherGUI extends JFrame {
 	
 	private Image cardback;
 	private Image blueone;
-	//TODO do the rest of the images
+	private Image bluetwo;
+	private Image bluethree;
+	private Image bluefour;
+	private Image bluefive;
+	private Image bluesix;
+	private Image blueseven;
+	private Image blueeight;
+	private Image bluenine;
+	private Image blueten;
+	
+	private Image purpleone;
+	private Image purpletwo;
+	private Image purplethree;
+	private Image purplefour;
+	private Image purplefive;
+	private Image purplesix;
+	private Image purpleseven;
+	private Image purpleeight;
+	private Image purplenine;
+	private Image purpleten;
+	
+	private Image greenone;
+	private Image greentwo;
+	private Image greenthree;
+	private Image greenfour;
+	private Image greenfive;
+	private Image greensix;
+	private Image greenseven;
+	private Image greeneight;
+	private Image greennine;
+	private Image greenten;
+	
+	private Image orangeone;
+	private Image orangetwo;
+	private Image orangethree;
+	private Image orangefour;
+	private Image orangefive;
+	private Image orangesix;
+	private Image orangeseven;
+	private Image orangeeight;
+	private Image orangenine;
+	private Image orangeten;
 	
 	private JTextArea info;
 	private JTextArea player2;
@@ -99,9 +140,52 @@ public class GoFishOtherGUI extends JFrame {
 	}
 	
 	private void loadImages() {
-		// TODO finish loading all images
 		try {
 			cardback=ImageIO.read(new File("Images/cardback.jpg"));
+			
+			blueone=ImageIO.read(new File("Images/1blue.jpeg"));
+			bluetwo=ImageIO.read(new File("Images/2blue.jpeg"));
+			bluethree=ImageIO.read(new File("Images/3blue.jpeg"));
+			bluefour=ImageIO.read(new File("Images/4blue.jpeg"));
+			bluefive=ImageIO.read(new File("Images/5blue.jpeg"));
+			bluesix=ImageIO.read(new File("Images/6blue.jpeg"));
+			blueseven=ImageIO.read(new File("Images/7blue.jpeg"));
+			blueeight=ImageIO.read(new File("Images/8blue.jpeg"));
+			bluenine=ImageIO.read(new File("Images/9blue.jpeg"));
+			blueten=ImageIO.read(new File("Images/10blue.jpeg"));
+			
+			purpleone=ImageIO.read(new File("Images/1purple.jpeg"));
+			purpletwo=ImageIO.read(new File("Images/2purple.jpeg"));
+			purplethree=ImageIO.read(new File("Images/3purple.jpeg"));
+			purplefour=ImageIO.read(new File("Images/4purple.jpeg"));
+			purplefive=ImageIO.read(new File("Images/5purple.jpeg"));
+			purplesix=ImageIO.read(new File("Images/6purple.jpeg"));
+			purpleseven=ImageIO.read(new File("Images/7purple.jpeg"));
+			purpleeight=ImageIO.read(new File("Images/8purple.jpeg"));
+			purplenine=ImageIO.read(new File("Images/9purple.jpeg"));
+			purpleten=ImageIO.read(new File("Images/10purple.jpeg"));
+			
+			greenone=ImageIO.read(new File("Images/1green.jpeg"));
+			greentwo=ImageIO.read(new File("Images/2green.jpeg"));
+			greenthree=ImageIO.read(new File("Images/3green.jpeg"));
+			greenfour=ImageIO.read(new File("Images/4green.jpeg"));
+			greenfive=ImageIO.read(new File("Images/5green.jpeg"));
+			greensix=ImageIO.read(new File("Images/6green.jpeg"));
+			greenseven=ImageIO.read(new File("Images/7green.jpeg"));
+			greeneight=ImageIO.read(new File("Images/8green.jpeg"));
+			greennine=ImageIO.read(new File("Images/9green.jpeg"));
+			greenten=ImageIO.read(new File("Images/10green.jpeg"));
+			
+			orangeone=ImageIO.read(new File("Images/1orange.jpeg"));
+			orangetwo=ImageIO.read(new File("Images/2orange.jpeg"));
+			orangethree=ImageIO.read(new File("Images/3orange.jpeg"));
+			orangefour=ImageIO.read(new File("Images/4orange.jpeg"));
+			orangefive=ImageIO.read(new File("Images/5orange.jpeg"));
+			orangesix=ImageIO.read(new File("Images/6orange.jpeg"));
+			orangeseven=ImageIO.read(new File("Images/7orange.jpeg"));
+			orangeeight=ImageIO.read(new File("Images/8orange.jpeg"));
+			orangenine=ImageIO.read(new File("Images/9orange.jpeg"));
+			orangeten=ImageIO.read(new File("Images/10orange.jpeg"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
