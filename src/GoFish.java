@@ -4,112 +4,115 @@ public class GoFish
 {
 	private static final String SELECT_RANK = " Please select the rank of the card you wish to ask for (integer 1-10)";
 	private static final String SELECT_PLAYER = " Please input the number of the player you wish to ask the card from. Ex. Player 1 would be 1";
+	private static final String PLAYER_OUT_OF_CARDS = " ran out of cards and there are still cards in the deck";
+	private static final String SKIP_PLAYER = " does not have any cards and no more cards in the deck, their turn is skipped";
 	
 	public static void main(String args[])
 	{
 		Scanner scan = new Scanner(System.in);
 		
-		Deck deck = new Deck();
-		
-		Player players[] = new Player[2];
+		Player players[] = new Player[Dealer.NUMBER_OF_PLAYERS];
 
 		for (int i = 0; i < players.length; i++)
 		{
 			players[i] = new Player("Player " + (i + 1), (i + 1));
-			players[i].draw();
 		}
 
-		playgame(players, scan, deck);
+		playgame(players, scan);
 
+		for(Player player: players)
+		{
+			player.closeConnection();
+		}
+		
 		scan.close();
 	}
 
-	private static void playgame(Player[] players, Scanner scan, Deck deck)
+	/**
+	 * Main game loop
+	 */
+	private static void playgame(Player[] players, Scanner scan)
 	{
-		int totalscore = checkscore(players.length, players);
-
+		int totalscore = calcTotalScore(players);
 		while (totalscore != 10)
 		{
 			// each player gets a turn
-			for (int i = 0; i < players.length; i++)
+			for (Player player: players)
 			{
-				if (players[i].getPlayerHand().size() == 0 && deck.getNumofDeckLeft() > 0)
+				boolean yourTurn = true;
+				while (yourTurn)
 				{
-					System.out.println(
-							players[i].getPlayerName() + " ran out of cards and there are still cards in the deck");
-					players[i].draw();
-				}
-
-				// if player does not have any cards they do not get to go
-				else if (players[i].getPlayerHand().size() == 0)
-				{
-					System.out.println(players[i].getPlayerName() + " does not have any cards, their turn is skipped");
-					continue;
-				}
-
-				printCurrentPlayersCards(players[i]);
-
-				// otherwise, player gets to go until turn is over (no more
-				// matches)
-				
-				int userrank = checkUserRankinput(scan, players[i]);
-				CardRank rank = checkRank(players[i], getCardRank(userrank), scan);
-
-				System.out.println(players[i].getPlayerName() + SELECT_PLAYER);
-				int otherplace = scan.nextInt();
-				while (otherplace > players.length || players[i].getPlayerNumber() == otherplace)
-				{
-					System.out.println("Select a player between 1 and " + players.length + " that is not yourself");
-					System.out.println(players[i].getPlayerName() + SELECT_PLAYER);
-					otherplace = scan.nextInt();
-				}
-
-				Player other = players[otherplace - 1];
-
-				while (players[i].requestCardsFromOther(rank, other))
-				{
-					if (players[i].getPlayerHand().size() == 0 && deck.getNumofDeckLeft() > 0)
+					if (player.getPlayerHand().size() == 0)
 					{
-						System.out.println(
-								players[i].getPlayerName() + " ran out of cards and there are still cards in the deck");
-						players[i].draw();
-					}
-					if (players[i].getPlayerHand().size() == 0)
-					{
-						break;
-					}
+						if(player.getRemainingDeck() > 0)
+						{
+							System.out.println(player.getPlayerName() + PLAYER_OUT_OF_CARDS);
+							player.draw();
+						}
+						else
+						{
+							System.out.println(player.getPlayerName() + SKIP_PLAYER);
+							break;
+						}
+					}					
+					
+					printCurrentPlayersCards(player);
 
-					printCurrentPlayersCards(players[i]);
-
-					// if returned true then they got the cards
-					userrank = checkUserRankinput(scan, players[i]);
-					rank = checkRank(players[i], getCardRank(userrank), scan);
-
-					System.out.println(players[i].getPlayerName() + SELECT_PLAYER);
-					otherplace = scan.nextInt();
-					while (otherplace > players.length || players[i].getPlayerNumber() == otherplace)
-					{
-						System.out.println("Select a player between 1 and " + players.length + " that is not yourself");
-						System.out.println(players[i].getPlayerName() + SELECT_PLAYER);
-						otherplace = scan.nextInt();
-					}
-					other = players[otherplace - 1];
+					CardRank rank = getRankFromPlayer(player, scan);
+					
+					int otherplace = getOtherPlayer(player, scan, players.length);
+					Player other = players[otherplace - 1];
+					
+					yourTurn = player.requestCardsFromOther(rank, other);
 				}
-				System.out.println(players[i].getPlayerName() + " GO FISH");
-				System.out.println();
-			}
+			}// for loop for each player
 
 			// see if anyone has won
-			totalscore = checkscore(players.length, players);
+			totalscore = calcTotalScore(players);
 
 			if (totalscore != 10)
 			{
-				printplayerhands(players.length, players);
+				printAllPlayersHands(players);
 			}
-		}
-	}
+		}// while loop for the entire game
+	} // playGame()
 
-	private static int checkUserRankinput(Scanner scan, Player player)
+	
+	/**
+	 * prompts the user for another player, represented by their place in the play order
+	 */
+	private static int getOtherPlayer(Player player, Scanner scan, int numberOfPlayers)
+	{
+		System.out.println(player.getPlayerName() + SELECT_PLAYER);
+		int otherplace = scan.nextInt();
+		while (otherplace > numberOfPlayers || player.getPlayerNumber() == otherplace)
+		{
+			System.out.println("Select a player between 1 and " + numberOfPlayers + " that is not yourself");
+			System.out.println(player.getPlayerName() + SELECT_PLAYER);
+			otherplace = scan.nextInt();
+		}
+		return otherplace;
+	}
+	
+	/**
+	 * gets a CardRank from the user, checks that the rank is in the user's hand, and re asks if necessary
+	 */
+	private static CardRank getRankFromPlayer(Player player, Scanner scan)
+	{		
+		CardRank rank = checkUserRankinput(scan, player);
+		while (!player.checkIfInHand(rank))
+		{
+			System.out.println("Selected rank is not in " + player.getPlayerName() + "'s hand");
+			rank = checkUserRankinput(scan, player);
+		}
+		return rank;
+	}
+	
+	/**
+	 * helps getRankFromPlayer
+	 * gets an int from the user, checks that the int is a valid card rank, and converts the int into the appropriate card rank
+	 */
+	private static CardRank checkUserRankinput(Scanner scan, Player player)
 	{
 		int newrank = 0;
 		while (newrank < 1 || newrank > 10)
@@ -117,21 +120,12 @@ public class GoFish
 			System.out.println(player.getPlayerName() + SELECT_RANK);
 			newrank = scan.nextInt();
 		}
-		return newrank;
+		return getCardRank(newrank);
 	}
-
-	private static CardRank checkRank(Player player, CardRank rank, Scanner scan)
-	{
-		while (!player.checkIfInHand(rank))
-		{
-			System.out.println("Selected rank is not in " + player.getPlayerName() + "'s hand");
-			System.out.println(player.getPlayerName() + SELECT_RANK);
-			int userrank = scan.nextInt();
-			rank = getCardRank(userrank);
-		}
-		return rank;
-	}
-
+	
+	/**
+	 * converts int into card rank
+	 */
 	private static CardRank getCardRank(int userrank)
 	{
 		for(CardRank rank : CardRank.values())
@@ -141,46 +135,48 @@ public class GoFish
 				return rank;
 			}
 		}
-		return null; // only happends if invalid number is passed
-	}
-	
-	private static void printCurrentPlayersCards(Player player)
-	{
-		System.out.println(player.getPlayerName() + "'s cards");
-		ArrayList<Card> temp = player.getPlayerHand();
-		for (int j = 0; j < temp.size(); j++)
-		{
-			System.out.print(" " + temp.get(j).getRank());
-		}
-		System.out.println();
+		return null; // only happens if invalid number is passed
 	}
 
-	private static int checkscore(int numofplayers, Player[] players)
+	/**
+	 * Prints each player's individual score
+	 * Calculates and return total score
+	 */
+	private static int calcTotalScore(Player[] players)
 	{
 		int totalscore = 0;
-		for (int i = 0; i < numofplayers; i++)
+		for (int i = 0; i < players.length; i++)
 		{
-			totalscore = totalscore + players[i].getScore();
+			totalscore += players[i].getScore();
 			System.out.println(players[i].getPlayerName() + " has " + players[i].getScore() + " points");
-
 		}
 		System.out.println();
 		System.out.println();
 		return totalscore;
 	}
 
-	private static void printplayerhands(int numofplayers, Player[] players)
+	/**
+	 * prints all player's hands
+	 */
+	private static void printAllPlayersHands(Player[] players)
 	{
-		for (int i = 0; i < numofplayers; i++)
+		for (int i = 0; i < players.length; i++)
 		{
-			System.out.println("name " + players[i].getPlayerName());
-			ArrayList<Card> temp = players[i].getPlayerHand();
-			for (int j = 0; j < temp.size(); j++)
-			{
-				System.out.print(" " + temp.get(j).getRank());
-			}
-			System.out.println();
+			printCurrentPlayersCards(players[i]);
 			System.out.println();
 		}
+	}
+
+	/**
+	 * prints the hand for one player
+	 */
+	private static void printCurrentPlayersCards(Player player)
+	{
+		System.out.println(player.getPlayerName() + "'s cards");
+		for(Card card: player.getPlayerHand())
+		{
+			System.out.print(" " + card.getRank());
+		}
+		System.out.println();
 	}
 }

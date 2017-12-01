@@ -3,10 +3,17 @@ import java.net.*;
 
 public class Dealer
 {
-	public static final int SOCKET_NUMBER = 10531;
-	public static final int GET_A_CARD = 1;
+	public static final int SOCKET_NUMBER = 10626;
+	
 	public static final int CLOSE_CONNECTION = 0;
+	public static final int GET_A_CARD = 1;
+	public static final int GET_REMAINING = 2;
+	
+	public static final int NUMBER_OF_PLAYERS = 2;
 
+	/**
+	 * main function for dealer / server
+	 */
 	public static void main(String[] args)
 	{
 		try
@@ -14,7 +21,10 @@ public class Dealer
 			Deck deck = new Deck();
 			ServerSocket server = new ServerSocket(SOCKET_NUMBER);
 			
-			DealerThread threads[] = new DealerThread[2];
+//			System.out.println("Port: " + SOCKET_NUMBER);
+//			System.out.println("IP: " + InetAddress.getLocalHost());
+			
+			DealerThread threads[] = new DealerThread[NUMBER_OF_PLAYERS];
 			
 			for (int i = 0; i < threads.length; i++)
 			{
@@ -28,15 +38,18 @@ public class Dealer
 			{
 				th.join();
 			}
-			System.out.println("closing");
+			
 			server.close();
-			System.out.println("closed");
+			System.out.println("\nServer is closed");
 		} catch (IOException | InterruptedException e)
 		{
 			e.printStackTrace();
-		}
-	}
+		}// catch
+	}// main()
 
+	/**
+	 *  allows the dealer to wait for input from multiple sockets at the same time
+	 */
 	private static class DealerThread extends Thread
 	{
 		private Deck deck;
@@ -58,7 +71,7 @@ public class Dealer
 				e.printStackTrace();
 				System.exit(1);
 			}
-		}
+		}// dealer thread constructor
 
 		@Override
 		public void run()
@@ -74,14 +87,17 @@ public class Dealer
 						Card tmp = deck.drawCard();
 						output.writeObject(tmp);
 					}
-				}
+					else if (in == GET_REMAINING)
+					{
+						output.writeObject(deck.getNumofDeckLeft()); // object stream readInt() is broken, so wrap int with Integer
+					}
+				}// while
 				System.out.println("break");
 			} catch (IOException e)
 			{
 				e.printStackTrace();
 				System.exit(1);
-			}
-
-		}
-	}
-}
+			} // catch
+		}// run()
+	}// private class dealer thread
+}// public class dealer

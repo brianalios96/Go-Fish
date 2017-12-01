@@ -12,6 +12,11 @@ public class Player
 	private DataOutputStream output;
 	private Socket sock;
 
+	private static final String URL = "localhost";
+//	private static final String URL = "cambridge.cs.arizona.edu";
+//	private static final String URL = "192.168.1.115"; // experiment
+	private static final String GO_FISH = " GO FISH\n";
+
 	public Player(String name, int num)
 	{
 		hand = new ArrayList<Card>();
@@ -21,7 +26,10 @@ public class Player
 
 		try
 		{
-			sock = new Socket("localhost", Dealer.SOCKET_NUMBER);
+//			System.out.println("Port: " + Dealer.SOCKET_NUMBER);
+//			System.out.println("IP: " + InetAddress.getByName(URL));
+			
+			sock = new Socket(URL, Dealer.SOCKET_NUMBER);
 			output = new DataOutputStream(sock.getOutputStream());
 			input = new ObjectInputStream(sock.getInputStream());
 
@@ -30,6 +38,7 @@ public class Player
 			e.printStackTrace();
 			System.exit(1);
 		}
+		draw();
 	}
 
 	public int getPlayerNumber()
@@ -42,6 +51,11 @@ public class Player
 		return name;
 	}
 
+	/**
+	 * requests all cards of the rank from the other player
+	 * goes fish if required
+	 * checks for four of a kind and removes from hand / increments score as appropriate
+	 */
 	public boolean requestCardsFromOther(CardRank rank, Player other)
 	{
 		boolean retval = true;
@@ -49,9 +63,9 @@ public class Player
 
 		// other player did not have requested card, draw a
 		// card from the deck
-		if (cardsFromOther.length == 0)
+		if (cardsFromOther.length == 0 && getRemainingDeck() > 0)
 		{
-			// TODO put if statement checking if the deck is empty
+			System.out.println(name + GO_FISH);
 			
 			Card tmp = getCardFromDealer();
 			hand.add(tmp);
@@ -71,6 +85,7 @@ public class Player
 			}
 		}
 
+		// checks for four of a kind
 		for (CardRank aRank : CardRank.values())
 		{
 			int count = 0;
@@ -85,6 +100,7 @@ public class Player
 
 			if (count == 4)
 			{
+				System.out.println(name + " completed rank: " + aRank);
 				score++;
 				for (int i = 0; i < hand.size(); i++)
 				{
@@ -95,12 +111,16 @@ public class Player
 					}
 				}
 			}
-		}
+		}// outer for loop over all card ranks, checking for four of a kind
 
 		Collections.sort(hand);
 		return retval;
-	}
+	} // request cards from other ()
 
+	/**
+	 * give all the cards of the requested rank
+	 * returns an empty array if player dosn't have that rank
+	 */
 	public Card[] giveCards(CardRank rank)
 	{
 		int count = 0;
@@ -124,11 +144,11 @@ public class Player
 					cards[i] = tmp;
 					i++;
 				}
-			}
+			} 
 		}
 
 		return cards;
-	}
+	} // give cards ()
 
 	public int getScore()
 	{
@@ -140,6 +160,9 @@ public class Player
 		return hand;
 	}
 
+	/**
+	 * checks if a rank is in the player's hand. necessary because you can't ask for ranks that you don't have
+	 */
 	public boolean checkIfInHand(CardRank rank)
 	{
 		for (int i = 0; i < hand.size(); i++)
@@ -152,15 +175,56 @@ public class Player
 		return false;
 	}
 
+	/**
+	 * draws five cards from the deck and sorts them
+	 */
 	public void draw()
 	{
 		for (int i = 0; i < 5; i++)
 		{
-			hand.add(getCardFromDealer());
+			if(getRemainingDeck() > 0)
+			{
+				hand.add(getCardFromDealer());
+			}
 		}
 		Collections.sort(hand);
 	}
+
+	/**
+	 * gets the number of cards in the deck, handles all socket communication for this
+	 */
+	public int getRemainingDeck()
+	{
+		try
+		{
+			output.writeInt(Dealer.GET_REMAINING);
+			return (Integer) input.readObject(); // object stream readInt() is broken, so wrap int with Integer
+		} catch (IOException | ClassNotFoundException e)
+		{
+			e.printStackTrace();
+			System.exit(1);
+		}
+		return Integer.MIN_VALUE; // impossible to reach but the compiler is dumb
+	}
 	
+	/**
+	 * closes the connection to the dealer
+	 */
+	public void closeConnection()
+	{
+		try
+		{
+			output.writeInt(Dealer.CLOSE_CONNECTION);
+		} catch (IOException e)
+		{
+			e.printStackTrace();
+			System.exit(1);
+		}
+	}
+
+	/**
+	 *  handles all socket communications with the dealer in order to get a card
+	 */
 	private Card getCardFromDealer()
 	{
 		try
@@ -174,4 +238,5 @@ public class Player
 		}
 		return null; // impossible to reach but the compiler is dumb
 	}
-}
+	
+} // public class player

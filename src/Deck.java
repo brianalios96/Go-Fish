@@ -31,6 +31,10 @@ public class Deck
 	
 	public Card drawCard()
 	{
+//		if(theDeck.isEmpty())
+//		{
+//			return null;
+//		}
 		return theDeck.remove(0);
 	}
 
