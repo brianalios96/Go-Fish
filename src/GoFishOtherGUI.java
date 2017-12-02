@@ -8,6 +8,18 @@ import javax.swing.*;
 public class GoFishOtherGUI extends JFrame {
 	private static final long serialVersionUID = -3381491740976366400L;
 	
+	private final String RANK_FROM_USER= "Select Rank of the Card you want to ask for (Integer of 1-10)";
+	private final String INVALID_RANK_FROM_USER= "Invalid rank selection. Select Rank of the Card you want to ask for (Integer of 1-10)";
+	
+	private final String PLAYER_SELECTION_FROM_USER= 
+			"Select the number of the player you wish to get cards from that is not yourself. "
+			+ "For example, For Player 1 as the selection, input 1 into the box";
+	
+	private final String INVALID_PLAYER_SELECTION_FROM_USER= 
+			"Invalid Player number selection. Select the number of the player you wish to get cards from that is not yourself. "
+			+ "For example, For Player 1 as the selection, input 1 into the box";
+	
+	
 	private Image cardback;
 	private Image blueone;
 	private Image bluetwo;
@@ -108,8 +120,40 @@ public class GoFishOtherGUI extends JFrame {
 		this.add(boardPanel, BorderLayout.CENTER);
 		this.add(info, BorderLayout.PAGE_END);
 		this.setVisible(true);
+		
+		getUserInputPopup();
+		
 	}
 	
+	private void getUserInputPopup() {
+		String userSelectedRank;
+		userSelectedRank = JOptionPane.showInputDialog(RANK_FROM_USER);
+		while(isParsable(userSelectedRank) == false || Integer.parseInt(userSelectedRank)<1 
+				|| Integer.parseInt(userSelectedRank)>10)
+		{
+			userSelectedRank= JOptionPane.showInputDialog(INVALID_RANK_FROM_USER);
+		}
+		
+		String userSelectedPlayer= JOptionPane.showInputDialog(PLAYER_SELECTION_FROM_USER);
+		while(isParsable(userSelectedPlayer) == false || Integer.parseInt(userSelectedPlayer)<1 
+				|| Integer.parseInt(userSelectedPlayer)>4)//TODO add the check for the player selecting himself
+		{
+			userSelectedPlayer = JOptionPane.showInputDialog(INVALID_PLAYER_SELECTION_FROM_USER);
+		}
+		
+		System.out.println("rank selected: "+ userSelectedRank +" player selected: "+ userSelectedPlayer);
+	}
+
+	private boolean isParsable(String input) {
+		boolean parsable = true;
+	    try{
+	        Integer.parseInt(input);
+	    }catch(NumberFormatException e){
+	        parsable = false;
+	    }
+	    return parsable;
+	}
+
 	private class DrawingPanel extends JPanel {
 		private static final long serialVersionUID = 1L;
 		
