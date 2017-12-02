@@ -12,8 +12,8 @@ public class Player
 	private DataOutputStream output;
 	private Socket sock;
 
-	private static final String URL = "localhost";
-//	private static final String URL = "cambridge.cs.arizona.edu";
+//	private static final String URL = "localhost";
+	private static final String URL = "cambridge.cs.arizona.edu";
 //	private static final String URL = "192.168.1.115"; // experiment
 	private static final String GO_FISH = " GO FISH\n";
 
