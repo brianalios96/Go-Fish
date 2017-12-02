@@ -22,17 +22,26 @@ public class Dealer
 			ServerSocket server = new ServerSocket(SOCKET_NUMBER);
 			
 //			System.out.println("Port: " + SOCKET_NUMBER);
-//			System.out.println("IP: " + InetAddress.getLocalHost());
+//			System.out.println("IP: " + server.getInetAddress().getHostAddress());
 			
 			DealerThread threads[] = new DealerThread[NUMBER_OF_PLAYERS];
-			
+			String addresses[] = new String[NUMBER_OF_PLAYERS];
 			for (int i = 0; i < threads.length; i++)
 			{
-				threads[i] = new DealerThread(deck, server.accept());
+				System.out.println("waiting");
+				Socket sock = server.accept();
+				InetSocketAddress addr = (InetSocketAddress) (sock.getRemoteSocketAddress());
+				addresses[i] = addr.getHostName();
+//				System.out.println(addr.getHostName());
 				System.out.println("socket accepted");
-				threads[i].start();
+				threads[i] = new DealerThread(deck, sock, addresses, i);
 			}
 
+			
+			for(DealerThread th : threads)
+			{
+				th.start();
+			}
 			
 			for(DealerThread th : threads)
 			{
@@ -43,7 +52,9 @@ public class Dealer
 			System.out.println("\nServer is closed");
 		} catch (IOException | InterruptedException e)
 		{
+			System.out.println("problem in Dealer. class: " + e.getClass());
 			e.printStackTrace();
+			System.exit(1);
 		}// catch
 	}// main()
 
@@ -56,16 +67,20 @@ public class Dealer
 		private DataInputStream input;
 		private ObjectOutputStream output;
 		private Socket sock;
-
-		DealerThread(Deck deck, Socket sock)
+		
+		private String[] addresses;
+		private int place;
+		
+		DealerThread(Deck deck, Socket sock, String[] addresses, int place)
 		{
 			this.deck = deck;
 			try
 			{
 				this.sock = sock;
 				output = new ObjectOutputStream(this.sock.getOutputStream());
-				input = new DataInputStream(this.sock.getInputStream());
-				
+				input = new DataInputStream(this.sock.getInputStream());	
+				this.addresses = addresses;
+				this.place = place;
 			} catch (IOException e)
 			{
 				e.printStackTrace();
@@ -78,6 +93,9 @@ public class Dealer
 		{
 			try
 			{
+				output.writeObject(addresses);
+				output.writeObject(place);
+				
 				int in = GET_A_CARD;
 				while (in != CLOSE_CONNECTION)
 				{

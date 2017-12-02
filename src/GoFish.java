@@ -6,80 +6,82 @@ public class GoFish
 	private static final String SELECT_PLAYER = " Please input the number of the player you wish to ask the card from. Ex. Player 1 would be 1";
 	private static final String PLAYER_OUT_OF_CARDS = " ran out of cards and there are still cards in the deck";
 	private static final String SKIP_PLAYER = " does not have any cards and no more cards in the deck, their turn is skipped";
-	
+
 	public static void main(String args[])
 	{
+		if (args.length == 0)
+		{
+			System.out.println("Must type IP address");
+			System.exit(1);
+		}
+
 		Scanner scan = new Scanner(System.in);
-		
-		Player players[] = new Player[Dealer.NUMBER_OF_PLAYERS];
 
-		for (int i = 0; i < players.length; i++)
-		{
-			players[i] = new Player("Player " + (i + 1), (i + 1));
-		}
+		Player player = new Player(args[0]);
+		playgame(player, scan);
+		player.closeConnection();
 
-		playgame(players, scan);
-
-		for(Player player: players)
-		{
-			player.closeConnection();
-		}
-		
 		scan.close();
 	}
 
 	/**
 	 * Main game loop
 	 */
-	private static void playgame(Player[] players, Scanner scan)
+	private static void playgame(Player player, Scanner scan)
 	{
-		int totalscore = calcTotalScore(players);
-		while (totalscore != 10)
-		{
-			// each player gets a turn
-			for (Player player: players)
-			{
-				boolean yourTurn = true;
-				while (yourTurn)
-				{
-					if (player.getPlayerHand().size() == 0)
-					{
-						if(player.getRemainingDeck() > 0)
-						{
-							System.out.println(player.getPlayerName() + PLAYER_OUT_OF_CARDS);
-							player.draw();
-						}
-						else
-						{
-							System.out.println(player.getPlayerName() + SKIP_PLAYER);
-							break;
-						}
-					}					
-					
-					printCurrentPlayersCards(player);
+		boolean firstTurn = true;
+		int scores[] = new int[Dealer.NUMBER_OF_PLAYERS];
 
-					CardRank rank = getRankFromPlayer(player, scan);
-					
-					int otherplace = getOtherPlayer(player, scan, players.length);
-					Player other = players[otherplace - 1];
-					
-					yourTurn = player.requestCardsFromOther(rank, other);
+		int totalscore = calcTotalScore(scores);
+		while (totalscore != 10)
+		// while (player.getRemainingDeck() > 0) // temporary until score is
+		// fixed
+		{
+			if (!firstTurn || player.getPlayerNumber() != 0)
+			{
+				scores = player.waitForTurn();
+			}
+			firstTurn = false;
+			boolean yourTurn = true;
+			while (yourTurn)
+			{
+				if (player.getPlayerHand().size() == 0)
+				{
+					if (player.getRemainingDeck() > 0)
+					{
+						System.out.println(player.getPlayerName() + PLAYER_OUT_OF_CARDS);
+						player.draw();
+					} else
+					{
+						System.out.println(player.getPlayerName() + SKIP_PLAYER);
+						break;
+					}
 				}
-			}// for loop for each player
+
+				printCurrentPlayersCards(player);
+
+				CardRank rank = getRankFromPlayer(player, scan);
+
+				int otherplace = getOtherPlayer(player, scan, Dealer.NUMBER_OF_PLAYERS);
+				int other = otherplace;
+				yourTurn = player.requestCardsFromOther(rank, other);
+			}
+
+			player.endTurn(scores);
 
 			// see if anyone has won
-			totalscore = calcTotalScore(players);
+			totalscore = calcTotalScore(scores);
 
-			if (totalscore != 10)
-			{
-				printAllPlayersHands(players);
-			}
-		}// while loop for the entire game
+			// if (totalscore != 10)
+			// {
+			// printAllPlayersHands(players);
+			// }
+		} // while loop for the entire game
 	} // playGame()
 
-	
 	/**
-	 * prompts the user for another player, represented by their place in the play order
+	 * prompts the user for another player, represented by their place in the
+	 * play order
 	 */
 	private static int getOtherPlayer(Player player, Scanner scan, int numberOfPlayers)
 	{
@@ -93,12 +95,13 @@ public class GoFish
 		}
 		return otherplace;
 	}
-	
+
 	/**
-	 * gets a CardRank from the user, checks that the rank is in the user's hand, and re asks if necessary
+	 * gets a CardRank from the user, checks that the rank is in the user's
+	 * hand, and re asks if necessary
 	 */
 	private static CardRank getRankFromPlayer(Player player, Scanner scan)
-	{		
+	{
 		CardRank rank = checkUserRankinput(scan, player);
 		while (!player.checkIfInHand(rank))
 		{
@@ -107,10 +110,10 @@ public class GoFish
 		}
 		return rank;
 	}
-	
+
 	/**
-	 * helps getRankFromPlayer
-	 * gets an int from the user, checks that the int is a valid card rank, and converts the int into the appropriate card rank
+	 * helps getRankFromPlayer gets an int from the user, checks that the int is
+	 * a valid card rank, and converts the int into the appropriate card rank
 	 */
 	private static CardRank checkUserRankinput(Scanner scan, Player player)
 	{
@@ -122,15 +125,15 @@ public class GoFish
 		}
 		return getCardRank(newrank);
 	}
-	
+
 	/**
 	 * converts int into card rank
 	 */
 	private static CardRank getCardRank(int userrank)
 	{
-		for(CardRank rank : CardRank.values())
+		for (CardRank rank : CardRank.values())
 		{
-			if(userrank == rank.getValue())
+			if (userrank == rank.getValue())
 			{
 				return rank;
 			}
@@ -139,16 +142,15 @@ public class GoFish
 	}
 
 	/**
-	 * Prints each player's individual score
-	 * Calculates and return total score
+	 * Prints each player's individual score Calculates and return total score
 	 */
-	private static int calcTotalScore(Player[] players)
+	private static int calcTotalScore(int[] scores)
 	{
 		int totalscore = 0;
-		for (int i = 0; i < players.length; i++)
+		for (int i = 0; i < scores.length; i++)
 		{
-			totalscore += players[i].getScore();
-			System.out.println(players[i].getPlayerName() + " has " + players[i].getScore() + " points");
+			totalscore += scores[i];
+			System.out.println("Player " + i + " has " + scores[i] + " points");
 		}
 		System.out.println();
 		System.out.println();
@@ -173,7 +175,7 @@ public class GoFish
 	private static void printCurrentPlayersCards(Player player)
 	{
 		System.out.println(player.getPlayerName() + "'s cards");
-		for(Card card: player.getPlayerHand())
+		for (Card card : player.getPlayerHand())
 		{
 			System.out.print(" " + card.getRank());
 		}

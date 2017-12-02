@@ -8,32 +8,44 @@ public class Player
 	private int score;
 	private String name;
 	private int playernumber;
-	private ObjectInputStream input;
-	private DataOutputStream output;
+	private ObjectInputStream dealerInput;
+	private DataOutputStream dealerOutput;
 	private Socket sock;
+	private ObjectInputStream upstream;
+	private ObjectOutputStream downstream;
 
-	private static final String URL = "localhost";
-//	private static final String URL = "cambridge.cs.arizona.edu";
-//	private static final String URL = "192.168.1.115"; // experiment
 	private static final String GO_FISH = " GO FISH\n";
 
-	public Player(String name, int num)
+	private static final int PLAYER_PORT = Dealer.SOCKET_NUMBER + 1;
+	private static final int YOUR_TURN = 9000;
+	
+	public Player(String IP)
 	{
 		hand = new ArrayList<Card>();
 		score = 0;
-		this.name = name;
-		playernumber = num;
-
 		try
 		{
-//			System.out.println("Port: " + Dealer.SOCKET_NUMBER);
-//			System.out.println("IP: " + InetAddress.getByName(URL));
+			PlayerThread helper = new PlayerThread();
+			helper.start();
+			sock = new Socket(IP, Dealer.SOCKET_NUMBER);
+			dealerOutput = new DataOutputStream(sock.getOutputStream());
+			dealerInput = new ObjectInputStream(sock.getInputStream());
+			System.out.println("connection");
 			
-			sock = new Socket(URL, Dealer.SOCKET_NUMBER);
-			output = new DataOutputStream(sock.getOutputStream());
-			input = new ObjectInputStream(sock.getInputStream());
+			String[] addresses = (String[]) dealerInput.readObject();
+			playernumber = (Integer) dealerInput.readObject();
+			this.name = "Player " + playernumber;
+			
+			int next = (playernumber + 1) % Dealer.NUMBER_OF_PLAYERS;
+			
+			Socket down = new Socket(addresses[next], PLAYER_PORT);
+			downstream = new ObjectOutputStream(down.getOutputStream());
+			
+			helper.join();
+			
+			System.out.println(name);
 
-		} catch (IOException e)
+		} catch (IOException | ClassNotFoundException  | InterruptedException e)
 		{
 			e.printStackTrace();
 			System.exit(1);
@@ -56,10 +68,11 @@ public class Player
 	 * goes fish if required
 	 * checks for four of a kind and removes from hand / increments score as appropriate
 	 */
-	public boolean requestCardsFromOther(CardRank rank, Player other)
+	public boolean requestCardsFromOther(CardRank rank, int other)
 	{
 		boolean retval = true;
-		Card[] cardsFromOther = other.giveCards(rank);
+		Card[] cardsFromOther = sendMessage(rank, other);
+
 
 		// other player did not have requested card, draw a
 		// card from the deck
@@ -117,11 +130,30 @@ public class Player
 		return retval;
 	} // request cards from other ()
 
+	private Card[] sendMessage(CardRank rank, int otherPlayer)
+	{
+		Message output = new Message();
+		output.recipientPlayer = otherPlayer;
+		output.originPlayer = playernumber;
+		output.rank = rank;
+		try
+		{
+			downstream.writeObject(output);
+			Message input = (Message) upstream.readObject();
+			return input.cards;
+		} catch (IOException | ClassNotFoundException e)
+		{
+			e.printStackTrace();
+			System.exit(1);
+		}
+		return null; //impossible to reach, compiler is still dumb
+	}
+	
 	/**
 	 * give all the cards of the requested rank
 	 * returns an empty array if player dosn't have that rank
 	 */
-	public Card[] giveCards(CardRank rank)
+	private Card[] giveCards(CardRank rank)
 	{
 		int count = 0;
 		for (Card card : hand)
@@ -197,8 +229,8 @@ public class Player
 	{
 		try
 		{
-			output.writeInt(Dealer.GET_REMAINING);
-			return (Integer) input.readObject(); // object stream readInt() is broken, so wrap int with Integer
+			dealerOutput.writeInt(Dealer.GET_REMAINING);
+			return (Integer) dealerInput.readObject(); // object stream readInt() is broken, so wrap int with Integer
 		} catch (IOException | ClassNotFoundException e)
 		{
 			e.printStackTrace();
@@ -214,7 +246,7 @@ public class Player
 	{
 		try
 		{
-			output.writeInt(Dealer.CLOSE_CONNECTION);
+			dealerOutput.writeInt(Dealer.CLOSE_CONNECTION);
 		} catch (IOException e)
 		{
 			e.printStackTrace();
@@ -229,8 +261,8 @@ public class Player
 	{
 		try
 		{
-			output.writeInt(Dealer.GET_A_CARD);
-			return (Card) input.readObject();
+			dealerOutput.writeInt(Dealer.GET_A_CARD);
+			return (Card) dealerInput.readObject();
 		} catch (IOException | ClassNotFoundException e)
 		{
 			e.printStackTrace();
@@ -238,5 +270,86 @@ public class Player
 		}
 		return null; // impossible to reach but the compiler is dumb
 	}
+	
+	
+	/**
+	 * while loops until it receives a message stating that it is this players turn
+	 * handles requests from other players for cards
+	 * forwards all other messages
+	 * @return TODO
+	 */
+	public int[] waitForTurn()
+	{
+		int[] scores = null; // null is required due to compiler, should always be overridden by first if block
+		boolean otherTurn = true;
+		while(otherTurn)
+		{
+			try
+			{
+				Message input = (Message) upstream.readObject();
+				if(input.messageType == YOUR_TURN)
+				{
+					scores = input.scores;
+					otherTurn = false;
+				}
+				else if(input.recipientPlayer == playernumber)
+				{
+					Message output = new Message();
+					output.recipientPlayer = input.originPlayer;
+					output.cards = giveCards(input.rank);
+					downstream.writeObject(output);
+				}
+				else
+				{
+					downstream.writeObject(input);
+				}
+			} catch (ClassNotFoundException | IOException e)
+			{
+				e.printStackTrace();
+				System.exit(1);
+			}
+		}
+		return scores;
+	}
+	
+	public void endTurn(int[] scores)
+	{
+		try
+		{
+			scores[playernumber] = score;
+			Message output = new Message();
+			output.messageType = YOUR_TURN;
+			output.scores = scores;
+			downstream.writeObject(output);
+		} catch (IOException e)
+		{
+			e.printStackTrace();
+			System.exit(1);
+		}
+	}
+	
+	/**
+	 * creates a server socket and waits for the connection from peer
+	 */
+	private class PlayerThread extends Thread
+	{
+		@Override
+		public void run()
+		{
+			try
+			{
+				ServerSocket server = new ServerSocket(PLAYER_PORT);
+				Socket up = server.accept();
+				upstream = new ObjectInputStream(up.getInputStream());
+				server.close();
+			} catch (IOException e)
+			{
+				e.printStackTrace();
+				System.exit(1);
+			}
+		}
+	}// private class player thread
+	
+
 	
 } // public class player

@@ -1,5 +1,6 @@
+import java.io.Serializable;
 
-public enum CardRank
+public enum CardRank implements Serializable
 {
 	ONE(1),
 	TWO(2),
