@@ -15,17 +15,17 @@ public class Deck
 				theDeck.add(new Card(rank));
 			}
 		}
-		System.out.println("before");
-		for(Card card: theDeck)
-		{
-			System.out.println(card.getRank());
-		}
+//		System.out.println("before");
+//		for(Card card: theDeck)
+//		{
+//			System.out.println(card.getRank());
+//		}
 		shuffle();
-		System.out.println("after");
-		for(Card card: theDeck)
-		{
-			System.out.println(card.getRank());
-		}
+//		System.out.println("after");
+//		for(Card card: theDeck)
+//		{
+//			System.out.println(card.getRank());
+//		}
 	}
 	
 	public int getNumofDeckLeft()
@@ -41,7 +41,7 @@ public class Deck
 	public Card drawCard()
 	{
 		Card tmp = theDeck.remove(0);
-		System.out.println("Remove: " + tmp.getRank());
+//		System.out.println("Remove: " + tmp.getRank());
 		return tmp;
 	}
 
