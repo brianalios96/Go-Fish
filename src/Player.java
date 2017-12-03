@@ -20,6 +20,7 @@ public class Player
 
 	private static final int PLAYER_PORT = Dealer.SOCKET_NUMBER + 1;
 	private static final int YOUR_TURN = 9000;
+	private static final int HAND_SIZE = 9999;
 	
 	public Player(String IP)
 	{
@@ -308,6 +309,11 @@ public class Player
 					scores = input.scores;
 					otherTurn = false;
 				}
+				else if(input.messageType == HAND_SIZE)
+				{
+					input.numberOfCards[playernumber] = hand.size();
+					downstream.writeObject(input);
+				}
 				else if(input.recipientPlayer == playernumber)
 				{
 					Message output = new Message();
@@ -328,6 +334,9 @@ public class Player
 		return scores;
 	}
 	
+	/**
+	 * tells the next player it is their turn, and tells them what everyone's score is
+	 */
 	public void endTurn(int[] scores)
 	{
 		try
@@ -342,6 +351,29 @@ public class Player
 			e.printStackTrace();
 			System.exit(1);
 		}
+	}
+	
+	/**
+	 * asks the other players how many cards are in their hand and return an array containing their answer
+	 */
+	public int[] getNumberCardsInHands()
+	{
+		int[] cardsInHands = new int[numberOfPlayers];
+		Message message = new Message();
+		message.messageType = HAND_SIZE;
+		message.numberOfCards = cardsInHands;
+		try
+		{
+			downstream.writeObject(message);
+			message = (Message) upstream.readObject();
+		} catch (IOException | ClassNotFoundException e)
+		{
+			e.printStackTrace();
+			System.exit(1);
+		}
+		cardsInHands = message.numberOfCards;
+		cardsInHands[playernumber] = hand.size();
+		return cardsInHands;
 	}
 	
 	/**

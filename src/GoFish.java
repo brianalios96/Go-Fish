@@ -57,9 +57,9 @@ public class GoFish
 						break;
 					}
 				}
-
+				printNumberInHand(player.getNumberCardsInHands());
+				
 				printCurrentPlayersCards(player);
-				System.out.println();
 
 				CardRank rank = getRankFromPlayer(player, scan);
 
@@ -75,6 +75,19 @@ public class GoFish
 		} // while loop for the entire game
 	} // playGame()
 
+	/**
+	 * prints how many cards are in everyone's hands
+	 */
+	private static void printNumberInHand(int[] handSize)
+	{
+		System.out.println("Number of cards in hands");
+		for(int i = 0; i < handSize.length; i++)
+		{
+			System.out.print("Player " + i + ": " + handSize + " ");
+		}
+		System.out.println();
+	}
+	
 	/**
 	 * Checks the user's input to see if it is a number.
 	 * If not, false is returned
@@ -98,27 +111,17 @@ public class GoFish
 	{
 		int numberOfPlayers = player.getNumberOfPlayers();
 		System.out.println(player.getPlayerName() + SELECT_PLAYER);
-		//int otherplace = scan.nextInt();
 
 		String userinput= scan.nextLine().trim();
-//		while(!isParsable(userinput))
-//		{
-//			System.out.println("Invalid input. "+player.getPlayerName()+SELECT_PLAYER);
-//			userinput=scan.nextLine();
-//		}
-		
-		//int otherplace= Integer.parseInt(userinput);
-		//while (!isParsable(userinput) || otherplace > (numberOfPlayers - 1) || player.getPlayerNumber() == otherplace)
+
 		while (!isParsable(userinput) || Integer.parseInt(userinput) > (numberOfPlayers - 1) || player.getPlayerNumber() == Integer.parseInt(userinput)
 				|| Integer.parseInt(userinput)<0)
 		{
 			System.out.println("Select a player between 0 and " + (numberOfPlayers-1) + " that is not yourself\n");
 			System.out.println(player.getPlayerName() + SELECT_PLAYER);
 			userinput=scan.nextLine().trim();
-			//otherplace= Integer.parseInt(userinput);
-			//otherplace = scan.nextInt();
 		}
-		return Integer.parseInt(userinput);//otherplace;
+		return Integer.parseInt(userinput);
 	}
 
 	/**
@@ -199,6 +202,6 @@ public class GoFish
 		{
 			System.out.print(" " + card.getRank());
 		}
-		System.out.println();
+		System.out.println("\n");
 	}
 }

@@ -11,4 +11,5 @@ public class Message implements Serializable
 	public CardRank rank;
 	public Card[] cards;
 	public int scores[];
+	public int numberOfCards[];
 }
