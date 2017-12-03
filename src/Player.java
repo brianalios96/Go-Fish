@@ -279,7 +279,9 @@ public class Player
 		try
 		{
 			dealerOutput.writeInt(Dealer.GET_A_CARD);
-			return (Card) dealerInput.readObject();
+			Card tmp = (Card) dealerInput.readObject();
+			System.out.println("Recieve: " + tmp.getRank() + "\n");
+			return tmp;
 		} catch (IOException | ClassNotFoundException e)
 		{
 			e.printStackTrace();

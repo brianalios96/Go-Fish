@@ -104,6 +104,7 @@ public class Dealer
 					if (in == GET_A_CARD)
 					{
 						Card tmp = deck.drawCard();
+						System.out.println("Send: " + tmp.getRank() + "\n");
 						output.writeObject(tmp);
 					}
 					else if (in == GET_REMAINING)

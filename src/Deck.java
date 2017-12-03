@@ -40,7 +40,9 @@ public class Deck
 	
 	public Card drawCard()
 	{
-		return theDeck.remove(0);
+		Card tmp = theDeck.remove(0);
+		System.out.println("Remove: " + tmp.getRank());
+		return tmp;
 	}
 
 }
