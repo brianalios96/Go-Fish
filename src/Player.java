@@ -128,7 +128,7 @@ public class Player
 				}
 			}
 
-			if (count == 4)
+			if (count >= 4)
 			{
 				System.out.println(name + " completed rank: " + aRank);
 				score++;
