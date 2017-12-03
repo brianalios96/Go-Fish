@@ -293,7 +293,6 @@ public class Player
 	 * while loops until it receives a message stating that it is this players turn
 	 * handles requests from other players for cards
 	 * forwards all other messages
-	 * @return TODO
 	 */
 	public int[] waitForTurn()
 	{
