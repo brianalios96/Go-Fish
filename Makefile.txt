@@ -1,0 +1,7 @@
+all: Dealer GoFish
+
+Dealer: Dealer.java
+	javac Dealer.java
+
+GoFish: GoFish.java
+	javac GoFish.java
