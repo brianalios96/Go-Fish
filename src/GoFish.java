@@ -87,9 +87,9 @@ public class GoFish
 	{
 		System.out.println(player.getPlayerName() + SELECT_PLAYER);
 		int otherplace = scan.nextInt();
-		while (otherplace > numberOfPlayers || player.getPlayerNumber() == otherplace)
+		while (otherplace >= numberOfPlayers || player.getPlayerNumber() == otherplace)
 		{
-			System.out.println("Select a player between 1 and " + numberOfPlayers + " that is not yourself");
+			System.out.println("Select a player between 0 and " + numberOfPlayers + " that is not yourself");
 			System.out.println(player.getPlayerName() + SELECT_PLAYER);
 			otherplace = scan.nextInt();
 		}
