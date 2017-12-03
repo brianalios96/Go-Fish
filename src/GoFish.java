@@ -3,15 +3,16 @@ import java.util.*;
 public class GoFish
 {
 	private static final String SELECT_RANK = " Please select the rank of the card you wish to ask for (integer 1-10)";
-	private static final String SELECT_PLAYER = " Please input the number of the player you wish to ask the card from. Ex. Player 1 would be 1";
-	private static final String PLAYER_OUT_OF_CARDS = " ran out of cards and there are still cards in the deck";
-	private static final String SKIP_PLAYER = " does not have any cards and no more cards in the deck, their turn is skipped";
+	private static final String SELECT_PLAYER = " Please input the number of the player you wish to ask the card from. Ex. Player 1 would be 1\n";
+	private static final String PLAYER_OUT_OF_CARDS = " ran out of cards and there are still cards in the deck\n";
+	private static final String SKIP_PLAYER = " does not have any cards and no more cards in the deck, their turn is skipped\n";
+	private static final String IP_ERROR = "Must type IP address";
 
 	public static void main(String args[])
 	{
 		if (args.length == 0)
 		{
-			System.out.println("Must type IP address");
+			System.out.println(IP_ERROR);
 			System.exit(1);
 		}
 
@@ -30,7 +31,8 @@ public class GoFish
 	private static void playgame(Player player, Scanner scan)
 	{
 		boolean firstTurn = true;
-		int scores[] = new int[Dealer.NUMBER_OF_PLAYERS];
+//		int scores[] = new int[Dealer.NUMBER_OF_PLAYERS];
+		int scores[] = new int[player.getNumberOfPlayers()];
 
 		int totalscore = calcTotalScore(scores);
 		while (totalscore != 10)
@@ -47,11 +49,11 @@ public class GoFish
 				{
 					if (player.getRemainingDeck() > 0)
 					{
-						System.out.println(player.getPlayerName() + PLAYER_OUT_OF_CARDS+"\n");
+						System.out.println(player.getPlayerName() + PLAYER_OUT_OF_CARDS);
 						player.draw();
 					} else
 					{
-						System.out.println(player.getPlayerName() + SKIP_PLAYER+"\n");
+						System.out.println(player.getPlayerName() + SKIP_PLAYER);
 						break;
 					}
 				}
@@ -94,13 +96,14 @@ public class GoFish
 	 */
 	private static int getOtherPlayer(Player player, Scanner scan, int numberOfPlayers)
 	{
-		System.out.println(player.getPlayerName() + SELECT_PLAYER+"\n");
+		numberOfPlayers = player.getNumberOfPlayers();
+		System.out.println(player.getPlayerName() + SELECT_PLAYER);
 		int otherplace = scan.nextInt();
-		//while (otherplace >= numberOfPlayers || player.getPlayerNumber() == otherplace)
+
 		while (otherplace > (numberOfPlayers - 1) || player.getPlayerNumber() == otherplace)
 		{
-			System.out.println("Select a player between 0 and " + (numberOfPlayers-1) + " that is not yourself"+"\n");
-			System.out.println(player.getPlayerName() + SELECT_PLAYER+"\n");
+			System.out.println("Select a player between 0 and " + (numberOfPlayers-1) + " that is not yourself\n");
+			System.out.println(player.getPlayerName() + SELECT_PLAYER);
 			otherplace = scan.nextInt();
 		}
 		return otherplace;

@@ -13,8 +13,10 @@ public class Player
 	private Socket sock;
 	private ObjectInputStream upstream;
 	private ObjectOutputStream downstream;
+	private int numberOfPlayers;
 
 	private static final String GO_FISH = " GO FISH\n";
+	private static final String NO_DECK = "Go Fish, Deck is out of cards.";
 
 	private static final int PLAYER_PORT = Dealer.SOCKET_NUMBER + 1;
 	private static final int YOUR_TURN = 9000;
@@ -35,8 +37,7 @@ public class Player
 			String[] addresses = (String[]) dealerInput.readObject();
 			playernumber = (Integer) dealerInput.readObject();
 			this.name = "Player " + playernumber;
-			
-//			int next = (playernumber + 1) % Dealer.NUMBER_OF_PLAYERS;
+			numberOfPlayers = addresses.length;
 			int next = (playernumber + 1) % addresses.length;
 			
 			Socket down = new Socket(addresses[next], PLAYER_PORT);
@@ -54,6 +55,11 @@ public class Player
 		draw();
 	}
 
+	public int getNumberOfPlayers()
+	{
+		return numberOfPlayers;
+	}
+	
 	public int getPlayerNumber()
 	{
 		return playernumber;
@@ -77,14 +83,23 @@ public class Player
 
 		// other player did not have requested card, draw a
 		// card from the deck
-		if (cardsFromOther.length == 0 && getRemainingDeck() > 0)
+		if (cardsFromOther.length == 0)
 		{
-			System.out.println(name + GO_FISH);
 			
-			Card tmp = getCardFromDealer();
-			hand.add(tmp);
-			if (tmp.getRank() != rank)
+			if(getRemainingDeck() > 0)
 			{
+				System.out.println(name + GO_FISH);
+				
+				Card tmp = getCardFromDealer();
+				hand.add(tmp);
+				if (tmp.getRank() != rank)
+				{
+					retval = false;
+				}
+			}
+			else
+			{
+				System.out.println(NO_DECK);
 				retval = false;
 			}
 		}
