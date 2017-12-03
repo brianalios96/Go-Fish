@@ -80,7 +80,7 @@ public class GoFish
 	 * If not, false is returned
 	 * 
 	 */
-	private boolean isParsable(String input) {
+	private static boolean isParsable(String input) {
 		boolean parsable = true;
 	    try{
 	        Integer.parseInt(input);
@@ -98,15 +98,27 @@ public class GoFish
 	{
 		int numberOfPlayers = player.getNumberOfPlayers();
 		System.out.println(player.getPlayerName() + SELECT_PLAYER);
-		int otherplace = scan.nextInt();
+		//int otherplace = scan.nextInt();
 
-		while (otherplace > (numberOfPlayers - 1) || player.getPlayerNumber() == otherplace)
+		String userinput= scan.nextLine().trim();
+//		while(!isParsable(userinput))
+//		{
+//			System.out.println("Invalid input. "+player.getPlayerName()+SELECT_PLAYER);
+//			userinput=scan.nextLine();
+//		}
+		
+		//int otherplace= Integer.parseInt(userinput);
+		//while (!isParsable(userinput) || otherplace > (numberOfPlayers - 1) || player.getPlayerNumber() == otherplace)
+		while (!isParsable(userinput) || Integer.parseInt(userinput) > (numberOfPlayers - 1) || player.getPlayerNumber() == Integer.parseInt(userinput)
+				|| Integer.parseInt(userinput)<0)
 		{
 			System.out.println("Select a player between 0 and " + (numberOfPlayers-1) + " that is not yourself\n");
 			System.out.println(player.getPlayerName() + SELECT_PLAYER);
-			otherplace = scan.nextInt();
+			userinput=scan.nextLine().trim();
+			//otherplace= Integer.parseInt(userinput);
+			//otherplace = scan.nextInt();
 		}
-		return otherplace;
+		return Integer.parseInt(userinput);//otherplace;
 	}
 
 	/**
@@ -131,10 +143,17 @@ public class GoFish
 	private static CardRank checkUserRankinput(Scanner scan, Player player)
 	{
 		int newrank = 0;
+		String userinput;
 		while (newrank < 1 || newrank > 10)
 		{
 			System.out.println(player.getPlayerName() + SELECT_RANK);
-			newrank = scan.nextInt();
+			userinput=scan.nextLine().trim();
+			while(!isParsable(userinput))
+			{
+				System.out.println(player.getPlayerName() + SELECT_RANK);
+				userinput=scan.nextLine().trim();
+			}
+			newrank = Integer.parseInt(userinput);//scan.nextInt();
 		}
 		return getCardRank(newrank);
 	}
