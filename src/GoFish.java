@@ -34,8 +34,6 @@ public class GoFish
 
 		int totalscore = calcTotalScore(scores);
 		while (totalscore != 10)
-		// while (player.getRemainingDeck() > 0) // temporary until score is
-		// fixed
 		{
 			if (!firstTurn || player.getPlayerNumber() != 0)
 			{
@@ -71,11 +69,6 @@ public class GoFish
 
 			// see if anyone has won
 			totalscore = calcTotalScore(scores);
-
-			// if (totalscore != 10)
-			// {
-			// printAllPlayersHands(players);
-			// }
 		} // while loop for the entire game
 	} // playGame()
 
@@ -87,9 +80,9 @@ public class GoFish
 	{
 		System.out.println(player.getPlayerName() + SELECT_PLAYER);
 		int otherplace = scan.nextInt();
-		while (otherplace > numberOfPlayers || player.getPlayerNumber() == otherplace)
+		while (otherplace > (numberOfPlayers - 1) || player.getPlayerNumber() == otherplace)
 		{
-			System.out.println("Select a player between 1 and " + numberOfPlayers + " that is not yourself");
+			System.out.println("Select a player between 0 and " + (numberOfPlayers-1) + " that is not yourself");
 			System.out.println(player.getPlayerName() + SELECT_PLAYER);
 			otherplace = scan.nextInt();
 		}
@@ -155,18 +148,6 @@ public class GoFish
 		System.out.println();
 		System.out.println();
 		return totalscore;
-	}
-
-	/**
-	 * prints all player's hands
-	 */
-	private static void printAllPlayersHands(Player[] players)
-	{
-		for (int i = 0; i < players.length; i++)
-		{
-			printCurrentPlayersCards(players[i]);
-			System.out.println();
-		}
 	}
 
 	/**
