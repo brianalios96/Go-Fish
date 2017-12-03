@@ -1,5 +1,4 @@
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
 
 public class Deck
 {
@@ -13,7 +12,7 @@ public class Deck
 		{
 			for(int i = 0; i < 4; i++)
 			{
-				theDeck.add(new Card(rank, null));
+				theDeck.add(new Card(rank));
 			}
 		}
 		shuffle();
@@ -31,10 +30,6 @@ public class Deck
 	
 	public Card drawCard()
 	{
-//		if(theDeck.isEmpty())
-//		{
-//			return null;
-//		}
 		return theDeck.remove(0);
 	}
 

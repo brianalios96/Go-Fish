@@ -36,7 +36,8 @@ public class Player
 			playernumber = (Integer) dealerInput.readObject();
 			this.name = "Player " + playernumber;
 			
-			int next = (playernumber + 1) % Dealer.NUMBER_OF_PLAYERS;
+//			int next = (playernumber + 1) % Dealer.NUMBER_OF_PLAYERS;
+			int next = (playernumber + 1) % addresses.length;
 			
 			Socket down = new Socket(addresses[next], PLAYER_PORT);
 			downstream = new ObjectOutputStream(down.getOutputStream());
