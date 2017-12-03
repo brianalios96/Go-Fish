@@ -9,7 +9,7 @@ public class Dealer
 	public static final int GET_A_CARD = 1;
 	public static final int GET_REMAINING = 2;
 	
-	public static final int NUMBER_OF_PLAYERS = 3;//2;
+	public static final int NUMBER_OF_PLAYERS = 4;//2;
 
 	/**
 	 * main function for dealer / server

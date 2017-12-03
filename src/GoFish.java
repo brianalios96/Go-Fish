@@ -34,8 +34,6 @@ public class GoFish
 
 		int totalscore = calcTotalScore(scores);
 		while (totalscore != 10)
-		// while (player.getRemainingDeck() > 0) // temporary until score is
-		// fixed
 		{
 			if (!firstTurn || player.getPlayerNumber() != 0)
 			{
@@ -49,16 +47,17 @@ public class GoFish
 				{
 					if (player.getRemainingDeck() > 0)
 					{
-						System.out.println(player.getPlayerName() + PLAYER_OUT_OF_CARDS);
+						System.out.println(player.getPlayerName() + PLAYER_OUT_OF_CARDS+"\n");
 						player.draw();
 					} else
 					{
-						System.out.println(player.getPlayerName() + SKIP_PLAYER);
+						System.out.println(player.getPlayerName() + SKIP_PLAYER+"\n");
 						break;
 					}
 				}
 
 				printCurrentPlayersCards(player);
+				System.out.println();
 
 				CardRank rank = getRankFromPlayer(player, scan);
 
@@ -71,26 +70,37 @@ public class GoFish
 
 			// see if anyone has won
 			totalscore = calcTotalScore(scores);
-
-			// if (totalscore != 10)
-			// {
-			// printAllPlayersHands(players);
-			// }
 		} // while loop for the entire game
 	} // playGame()
 
+	/**
+	 * Checks the user's input to see if it is a number.
+	 * If not, false is returned
+	 * 
+	 */
+	private boolean isParsable(String input) {
+		boolean parsable = true;
+	    try{
+	        Integer.parseInt(input);
+	    }catch(NumberFormatException e){
+	        parsable = false;
+	    }
+	    return parsable;
+	}
+	
 	/**
 	 * prompts the user for another player, represented by their place in the
 	 * play order
 	 */
 	private static int getOtherPlayer(Player player, Scanner scan, int numberOfPlayers)
 	{
-		System.out.println(player.getPlayerName() + SELECT_PLAYER);
+		System.out.println(player.getPlayerName() + SELECT_PLAYER+"\n");
 		int otherplace = scan.nextInt();
-		while (otherplace >= numberOfPlayers || player.getPlayerNumber() == otherplace)
+		//while (otherplace >= numberOfPlayers || player.getPlayerNumber() == otherplace)
+		while (otherplace > (numberOfPlayers - 1) || player.getPlayerNumber() == otherplace)
 		{
-			System.out.println("Select a player between 0 and " + numberOfPlayers + " that is not yourself");
-			System.out.println(player.getPlayerName() + SELECT_PLAYER);
+			System.out.println("Select a player between 0 and " + (numberOfPlayers-1) + " that is not yourself"+"\n");
+			System.out.println(player.getPlayerName() + SELECT_PLAYER+"\n");
 			otherplace = scan.nextInt();
 		}
 		return otherplace;
@@ -155,18 +165,6 @@ public class GoFish
 		System.out.println();
 		System.out.println();
 		return totalscore;
-	}
-
-	/**
-	 * prints all player's hands
-	 */
-	private static void printAllPlayersHands(Player[] players)
-	{
-		for (int i = 0; i < players.length; i++)
-		{
-			printCurrentPlayersCards(players[i]);
-			System.out.println();
-		}
 	}
 
 	/**
