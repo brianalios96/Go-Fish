@@ -83,7 +83,7 @@ public class GoFish
 		System.out.println("Number of cards in hands");
 		for(int i = 0; i < handSize.length; i++)
 		{
-			System.out.print("Player " + i + ": " + handSize + " ");
+			System.out.print("Player " + i + ": " + handSize[i] + " ");
 		}
 		System.out.println();
 	}
