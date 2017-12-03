@@ -31,7 +31,7 @@ public class GoFish
 	private static void playgame(Player player, Scanner scan)
 	{
 		boolean firstTurn = true;
-//		int scores[] = new int[Dealer.NUMBER_OF_PLAYERS];
+
 		int scores[] = new int[player.getNumberOfPlayers()];
 
 		int totalscore = calcTotalScore(scores);
@@ -63,7 +63,7 @@ public class GoFish
 
 				CardRank rank = getRankFromPlayer(player, scan);
 
-				int otherplace = getOtherPlayer(player, scan, Dealer.NUMBER_OF_PLAYERS);
+				int otherplace = getOtherPlayer(player, scan);
 				int other = otherplace;
 				yourTurn = player.requestCardsFromOther(rank, other);
 			}
@@ -94,9 +94,9 @@ public class GoFish
 	 * prompts the user for another player, represented by their place in the
 	 * play order
 	 */
-	private static int getOtherPlayer(Player player, Scanner scan, int numberOfPlayers)
+	private static int getOtherPlayer(Player player, Scanner scan)
 	{
-		numberOfPlayers = player.getNumberOfPlayers();
+		int numberOfPlayers = player.getNumberOfPlayers();
 		System.out.println(player.getPlayerName() + SELECT_PLAYER);
 		int otherplace = scan.nextInt();
 
